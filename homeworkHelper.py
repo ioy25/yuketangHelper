@@ -11,20 +11,20 @@ import json
 
 # 以下的csrftoken和sessionid需要改成自己登录后的cookie中对应的字段！！！！而且脚本需在登录雨课堂状态下使用
 # 登录上华工研究生雨课堂，然后按F12-->选Application-->找到它的cookies，寻找csrftoken和sessionid字段，并复制到下面两行即可
-csrftoken = "yours" #需改成自己的
-sessionid = "yours" #需改成自己的
+csrftoken = "27YmzODqlolabN2pNitj4gPsvxXCM7Qk" #需改成自己的
+sessionid = "1eajk99ol5n8ptjjhkdrswcqsrrmp21k" #需改成自己的
 
 # 会自动跳过已经完成的题目，无须担心，如果运行一遍后，仍有遗漏，再次运行即可。
 # 因为作业答案在网页接口中返回了，因此本脚本才能自动答题
 headers = {
     'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:83.0) Gecko/20100101 Firefox/83.0',
     'Content-Type': 'application/json;charset=UTF-8',
-    'Cookie': 'csrftoken=' + csrftoken + '; sessionid=' + sessionid + '; university_id=3078; platform_id=3',
+    'Cookie': 'csrftoken=' + csrftoken + '; sessionid=' + sessionid + '; university_id=3409; platform_id=3',
     'x-csrftoken': csrftoken,
     'sec-fetch-dest': 'empty',
     'sec-fetch-mode': 'cors',
     'sec-fetch-site': 'same-origin',
-    'university-id': '3078',
+    'university-id': '3409',
     'xtbz': 'cloud',
 }
 
@@ -38,7 +38,7 @@ leaf_type = {
 
 def do_homework(submit_url, classroom_id, course_sign, course_name):
     # second, need to get homework ids
-    get_homework_ids = "https://gsscut.yuketang.cn/mooc-api/v1/lms/learn/course/chapter?cid="+str(classroom_id)+"&term=latest&uv_id=3078&sign="+course_sign
+    get_homework_ids = "https://fjbu.yuketang.cn/mooc-api/v1/lms/learn/course/chapter?cid="+str(classroom_id)+"&term=latest&uv_id=3409&sign="+course_sign
     homework_ids_response = requests.get(url=get_homework_ids, headers=headers)
     homework_json = json.loads(homework_ids_response.text)
     homework_ids = []
@@ -62,13 +62,13 @@ def do_homework(submit_url, classroom_id, course_sign, course_name):
 
     # finally, we have all the data needed
     for homework in homework_ids:
-        get_leaf_type_id_url = "https://gsscut.yuketang.cn/mooc-api/v1/lms/learn/leaf_info/"+str(classroom_id)+"/"+str(homework)+"/?term=latest&uv_id=3078"
+        get_leaf_type_id_url = "https://fjbu.yuketang.cn/mooc-api/v1/lms/learn/leaf_info/"+str(classroom_id)+"/"+str(homework)+"/?term=latest&uv_id=3409"
         leaf_response = requests.get(url=get_leaf_type_id_url, headers=headers)
         try:
             leaf_id = json.loads(leaf_response.text)["data"]["content_info"]["leaf_type_id"]
         except:
             continue
-        problem_url = "https://gsscut.yuketang.cn/mooc-api/v1/lms/exercise/get_exercise_list/"+str(leaf_id)+"/?term=latest&uv_id=3078"
+        problem_url = "https://fjbu.yuketang.cn/mooc-api/v1/lms/exercise/get_exercise_list/"+str(leaf_id)+"/?term=latest&uv_id=3409"
         id_response = requests.get(url=problem_url, headers=headers)
         dictionary = json.loads(id_response.text)
         for pro in dictionary["data"]["problems"]:
@@ -114,8 +114,8 @@ if __name__ == "__main__":
     course = {}
 
     # first, need to get classroom_id
-    get_classroom_id = "https://gsscut.yuketang.cn/mooc-api/v1/lms/user/user-courses/?status=1&page=1&no_page=1&term=latest&uv_id=3078"
-    submit_url = "https://gsscut.yuketang.cn/mooc-api/v1/lms/exercise/problem_apply/?term=latest&uv_id=3078"
+    get_classroom_id = "https://fjbu.yuketang.cn/mooc-api/v1/lms/user/user-courses/?status=1&page=1&no_page=1&term=latest&uv_id=3409"
+    submit_url = "https://fjbu.yuketang.cn/mooc-api/v1/lms/exercise/problem_apply/?term=latest&uv_id=3409"
     classroom_id_response = requests.get(url=get_classroom_id, headers=headers)
     try:
         for ins in json.loads(classroom_id_response.text)["data"]["product_list"]:
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         raise Exception("fail while getting classroom_id!!! please re-run this program!")
     for index, value in enumerate(your_courses):
         print("编号："+str(index+1)+" 课名："+str(value["course_name"]))
-    number = input("你想刷哪门课呢？请输入编号。输入0表示全部课程都刷一遍\n")
+    number = 0("你想刷哪门课呢？请输入编号。输入0表示全部课程都刷一遍\n")
     if int(number)==0:
         for ins in your_courses:
             do_homework(submit_url, ins["classroom_id"], ins["course_sign"], ins["course_name"])
